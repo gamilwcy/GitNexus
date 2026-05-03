@@ -22,4 +22,6 @@ export enum SupportedLanguages {
   Vue = 'vue',
   /** Standalone regex processor — no tree-sitter, no LanguageProvider. */
   Cobol = 'cobol',
+  /** Lua 5.1 / Luau — OpenResty, Lapis, game scripting, Neovim plugins. */
+  Lua = 'lua',
 }

@@ -160,6 +160,13 @@ const SOURCES: Record<string, GrammarSource> = {
       'Kotlin parsing disabled: `tree-sitter-kotlin` is an optionalDependency ' +
       'and is not installed (or its native binding failed to build).',
   },
+  [SupportedLanguages.Lua]: {
+    load: () => _require('tree-sitter-lua'),
+    optional: true,
+    unavailableNote:
+      'Lua parsing disabled: `tree-sitter-lua` is an optionalDependency ' +
+      'and is not installed (or its native binding failed to build).',
+  },
 };
 
 type LoadResult =

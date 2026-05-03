@@ -1373,6 +1373,83 @@ export const DART_QUERIES = `
       (type_identifier) @heritage.trait))) @heritage
 `;
 
+export const LUA_QUERIES = `
+; ── Functions (top-level) ────────────────────────────────────────────────────
+(function_definition
+  name: (identifier) @name) @definition.function
+
+; ── Local functions ─────────────────────────────────────────────────────
+(local_function
+  name: (identifier) @name) @definition.function
+
+; ── Table methods (function inside table) ─────────────────────
+(function_definition
+  (identifier) @name
+  .
+  (table_index
+    (string) @table_name)) @definition.method
+
+; ── Function calls ───────────────────────────────────────────────────
+(function_call
+  (identifier) @call.name) @call
+
+; ── Method calls (obj.method()) ───────────────────────────────────
+(function_call
+  (dot_index_expression
+    (identifier) @call.receiver
+    (identifier) @call.name)) @call
+
+; ── Method calls (obj:method()) ────────────────────────────────
+(function_call
+  (colon_index_expression
+    (identifier) @call.receiver
+    (identifier) @call.name)) @call
+
+; ── Variable declarations ─────────────────────────────────────
+(assignment_statement
+  (variable_list
+    (variable
+      (identifier) @name)))
+
+; ── Local variables ─────────────────────────────────────────────
+(local_variable_declaration
+  (variable_list
+    (variable
+      (identifier) @name)))
+
+; ── Table fields ──────────────────────────────────────────────────
+(table_constructor
+  (field
+    (field_key
+      (identifier) @name))) @definition.property
+
+; ── require() import ─────────────────────────────────────────────
+(function_call
+  (identifier) @call.name
+  (#match? @call.name "^require$")
+  (arguments
+    (string_expression
+      (string) @import.source))) @import
+
+; ── require_relative() import ────────────────────────────────
+(function_call
+  (identifier) @call.name
+  (#match? @call.name "^require_relative$")
+  (arguments
+    (string_expression
+      (string) @import.source))) @import
+
+; ── module.exports ─────────────────────────────────────
+(assignment_statement
+  (variable_list
+    (variable
+      (dot_index_expression
+        (identifier) @exp.module
+        (identifier) @exp.name)))
+  (#eq? @exp.module "module")
+  (#eq? @exp.name "exports"))
+`;
+
 import { SupportedLanguages } from 'gitnexus-shared';
 
 export const LANGUAGE_QUERIES: Record<SupportedLanguages, string> = {
@@ -1390,6 +1467,7 @@ export const LANGUAGE_QUERIES: Record<SupportedLanguages, string> = {
   [SupportedLanguages.Ruby]: RUBY_QUERIES,
   [SupportedLanguages.Swift]: SWIFT_QUERIES,
   [SupportedLanguages.Dart]: DART_QUERIES,
-  [SupportedLanguages.Vue]: TYPESCRIPT_QUERIES, // Vue <script> blocks are parsed as TypeScript
-  [SupportedLanguages.Cobol]: '', // Standalone regex processor — no tree-sitter queries
+  [SupportedLanguages.Vue]: TYPESCRIPT_QUERIES,
+  [SupportedLanguages.Cobol]: '',
+  [SupportedLanguages.Lua]: LUA_QUERIES,
 };
